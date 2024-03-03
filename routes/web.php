@@ -22,6 +22,8 @@ Route::redirect('/dashboard', '/sales');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/sales', [SalesController::class, 'index'])->name('coffee.sales');
+    Route::post('/sales/calculate-price', [SalesController::class, 'calculate'])->name('coffee.calculate');
+    Route::post('/sales/record', [SalesController::class, 'store'])->name('coffee.record');
 });
 
 Route::get('/shipping-partners', function () {
