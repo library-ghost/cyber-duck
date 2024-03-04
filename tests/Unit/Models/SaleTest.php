@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Product;
 use App\Models\Sale;
+use Carbon\Carbon;
 use Tests\TestCase;
 use Tests\Traits\SalesTrait;
 
@@ -32,10 +34,14 @@ class SaleTest extends TestCase
     {
         $data = $this->getValidSaleData();
         $sale = Sale::createWithAttributes($data);
+        $expectedProduct = Product::where('id', '=', $sale['product_id'])->first();
+        $expectedDate = Carbon::parse($sale['created_at']);
         $expectedArray = [
+            'product' => $expectedProduct->name,
             'quantity' => $data['quantity'],
             'unit_cost' => Sale::convertToCents($data['unit_cost']),
             'selling_price' => Sale::convertToCents($data['selling_price']),
+            'created_at' => $expectedDate->format('Y-m-d H:i:s'),
         ];
         $this->assertEquals($expectedArray, $sale->asTableData());
 

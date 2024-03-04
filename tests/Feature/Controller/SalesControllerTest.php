@@ -139,6 +139,30 @@ class SalesControllerTest extends TestCase
 
     }
 
+    public function test_cannot_create_sales_record_with_invalid_product_id()
+    {
+        $user = User::factory()->create();
+
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+
+        $url = '/sales/record';
+
+        $payload = $this->getInvalidProductSaleData();
+        $headers = [
+            'X-CSRF-TOKEN' => csrf_token(),
+            'Content-Type' => 'application/json'
+        ];
+
+        $response = $this->json('POST', $url, $payload, $headers);
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+
+    }
+
     public function test_cannot_create_sales_record_if_not_authenticated()
     {
         $url = '/sales/record';
@@ -153,7 +177,6 @@ class SalesControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
-    //test calculate endpoint
     public function test_can_calculate_selling_price_with_valid_data()
     {
         $user = User::factory()->create();

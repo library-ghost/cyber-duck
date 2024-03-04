@@ -4,7 +4,8 @@ import {ref, watch} from 'vue';
 import CurrencyInput from './CurrencyInput';
 
 const props = defineProps({
-    sales: Array
+    sales: Array,
+    products: Array
 });
 
 const quantity = ref(0);
@@ -12,6 +13,7 @@ const unitCost = ref(0);
 const sellingPrice = ref(0);
 const hasError = ref(false);
 const salesRef = ref(props.sales);
+const product = ref(1);
 
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -47,6 +49,7 @@ async function recordSale() {
         'quantity': quantity.value,
         'unit_cost': unitCost.value,
         'selling_price': sellingPrice.value,
+        'product_id' : product.value,
     });
     try {
         const response = await axios.post('/sales/record', data, {
@@ -82,7 +85,18 @@ function toGBP(cents) {
     <section>
         <div class="w-full w-100">
             <div class="flex flex-wrap -mx-3 mb-2">
-                <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+                <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="product">
+                        Product
+                    </label>
+                    <select
+                        v-model="product"
+                        class="appearance-none block w-full text-gray-700 border border-gray-700 rounded py-3.5 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        id="product">
+                        <option v-for="product in products" :value="product.id">{{ product.name }}</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-1/5 px-3 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="qty">
                         Quantity
                     </label>
@@ -92,7 +106,7 @@ function toGBP(cents) {
                         :options="{ currency: 'GBP', currencyDisplay: 'hidden', precision: 0 }"
                     />
                 </div>
-                <div class="w-full md:w-1/4 px-4 mb-6 md:mb-0">
+                <div class="w-full md:w-1/5 px-4 mb-6 md:mb-0">
                     <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="uc">
                         Unit Cost
                     </label>
@@ -102,7 +116,7 @@ function toGBP(cents) {
                         :options="{ currency: 'GBP' }"
                     />
                 </div>
-                <div class="w-full md:w-1/4 px-4 mb-6 md:mb-0">
+                <div class="w-full md:w-1/5 px-4 mb-6 md:mb-0">
                     <span class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
                         Selling Price
                     </span>
@@ -110,7 +124,7 @@ function toGBP(cents) {
                         £{{ sellingPrice }}
                     </div>
                 </div>
-                <div class="w-full md:w-1/4 px-4 mb-6 md:mb-0">
+                <div class="w-full md:w-1/5 px-4 mb-6 md:mb-0">
                     <button
                         class="mt-7 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         @click="recordSale()"
@@ -133,9 +147,11 @@ function toGBP(cents) {
             <table class="table-fixed border-spacing-2 border-separate">
                 <thead>
                 <tr class="px-12 bg-blue-200">
+                    <th class="text-left px-6 py-2">Product</th>
                     <th class="text-left px-6 py-2">Quantity</th>
                     <th class="text-left px-6 py-2">Unit Cost</th>
                     <th class="text-left px-6 py-2">Selling Price</th>
+                    <th class="text-left px-6 py-2">Sold at</th>
                 </tr>
                 </thead>
 
@@ -144,9 +160,11 @@ function toGBP(cents) {
                     v-for="(sale, index) in salesRef"
                     :class="index % 2 === 0 ? 'bg-gray-200' : 'bg-gray-100'"
                 >
+                    <td class="px-6 py-4" v-text="sale.product"></td>
                     <td class="px-6 py-4" v-text="sale.quantity"></td>
                     <td class="px-6 py-4" v-text="toGBP(sale.unit_cost)"></td>
                     <td class="px-6 py-4" v-text="toGBP(sale.selling_price)"></td>
+                    <td class="px-6 py-4" v-text="$filters.formatDate(sale.created_at)"></td>
                 </tr>
                 </tbody>
             </table>

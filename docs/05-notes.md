@@ -24,4 +24,29 @@
 
 ![with_records.png](with_records.png)
 
+## Part 2
+
+- For this part I added a new products table to store the coffee products. I then added the `product_id` foreign key column to the `sales` table.
+- To prepare local dev run `php artisan migrate:fresh --seed`. In real environments where we care about the data I would just run the migration and perhaps use Laravel Tinker to add the original coffee to the `product_id` column for all existing sales. Ideally I'd also create another admin page for adding new coffee products so that the user can manage it themselves.
+- The product dropdown is populated from the products table and the sale history table by joining the products and sales tables.
+- I added new Product tests and modified existing tests to incorporate the new `product_id` field. I also modified the `SaleRecordRequest` handler to check if products exits before storing in sales.
+- I added a global Vue filter for formatting dates using `moment.js`.
+- I'm committing the css and js compiled for dev like it is in the base repo, but in real life this would be handled by a build script or pipeline based on the environment.
+- This is the kind of project that you could really keep adding to and improving given the time. 
+- For example here are some things I didn't get a chance to implement, but would like:
+  - Some throttling/delay on calculating the selling price.
+  - A loading bar on submit to give some visual feedback to the user.
+  - Order by column functionality on the sales history table. 
+  - Chunking the sales query results and implementing pagination or infinite scrolling.
+  - More tests around calculation and rounding. 
+  - More informative error handling.
+  - And I'm sure I'll think of loads more after I submit this :) 
+
+### Usage
+
+- Below you can see the Product dropdown added to the form and the additional fields added to the table. 
+- It is used in the same way outlined above in Part 1.
+
+![part_2.png](part_2.png)
+
 

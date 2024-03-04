@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SaleCalculatePriceRequest;
 use App\Http\Requests\SaleRecordRequest;
+use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -16,7 +17,8 @@ class SalesController extends Controller
     public function index(): View
     {
         return view('coffee_sales', [
-            'sales' => Sale::select('quantity', 'unit_cost', 'selling_price')->get()->toArray()
+            'sales' => Sale::getSalesRecords(),
+            'products' => Product::select('id', 'name')->get()->toArray(),
         ]);
     }
 
@@ -29,6 +31,7 @@ class SalesController extends Controller
             'quantity' => $request->get('quantity'),
             'unit_cost' => $request->get('unit_cost'),
             'selling_price' => $request->get('selling_price'),
+            'product_id' => $request->get('product_id'),
         ]);
 
         return response()->json([

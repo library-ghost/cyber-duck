@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,6 +33,7 @@ class SaleRecordRequest extends FormRequest
             'quantity' => 'required|int|gt:0',
             'unit_cost' => 'required|numeric|gt:0|decimal:0,2',
             'selling_price' => 'required|numeric|gt:0|decimal:0,2',
+            'product_id' => 'required|int|gt:0',
         ];
     }
 
@@ -47,6 +49,11 @@ class SaleRecordRequest extends FormRequest
                 $quantity = $this->get('quantity');
                 $unitCost = $this->get('unit_cost');
                 $sellingPrice = $this->get('selling_price');
+                $productId = $this->get('product_id');
+
+                if (!Product::where('id', $productId)->exists()) {
+                    $validator->errors()->add('product_id', 'invalid product id');
+                }
 
                 if (!Sale::validateSellingPrice($quantity, $unitCost, $sellingPrice)) {
                     $validator->errors()->add('selling_price', 'invalid selling price');
